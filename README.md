@@ -27,3 +27,7 @@ From Wikipedia:
 - Typescript
 - Mocha & Chai
 - Typechain
+
+## License
+
+MIT
