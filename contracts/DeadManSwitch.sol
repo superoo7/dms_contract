@@ -21,6 +21,7 @@ contract DeadManSwitch is Ownership {
      */
     uint256 public blockThreshold;
 
+    bool public active;
 
     // Event
     event Transfer(
@@ -29,7 +30,6 @@ contract DeadManSwitch is Ownership {
         address indexed to,
         uint256 amount
     );
-
 
     /**
      * @dev A modifier that allows both owner and beneficiary (when owner isDead) to access to the method
@@ -44,6 +44,11 @@ contract DeadManSwitch is Ownership {
     {
         lastCheckInBlock = block.number;
         blockThreshold = _blockThreshold;
+        active = true;
+    }
+
+    function setActive(bool _active) public onlyAllowWithdrawal {
+        active = _active;
     }
 
 
@@ -70,34 +75,36 @@ contract DeadManSwitch is Ownership {
         return blockNumDiff >= blockThreshold;
     }
 
-    /**
-     * @dev allow Owner to send ether
-     */
-    function sendFunds(address _destination,  uint256 _amount, bytes calldata _data) external onlyOwner {
-        (bool success, ) = _destination.call.value(_amount)(_data);
-        require(success, "[sendFunds] Transfer failure");
-        emit Transfer(
-            address(0),
-            address(this),
-            _destination,
-            _amount
-        );
-    }
 
-    /** 
-     * @dev withdraw ether
-     */
-    function withdrawEther(uint256 _amount) external onlyAllowWithdrawal {
-        address payable self = address(this);
-        require(_amount <= self.balance, "Insufficient balance in the contract.");
-        (bool success, ) = msg.sender.call.value(_amount)("");
-        require(success, "[claim] Tranfer failed");
-        emit Transfer(
-            address(0),
-            address(this),
-            msg.sender,
-            _amount
-        );
+    function refund(
+        address _tokenAddress,
+        uint256 _amount
+    ) public onlyAllowWithdrawal {
+        if (_tokenAddress == address(0)) {
+            // Ether fund
+            address payable self = address(this);
+            require(_amount <= self.balance, "Insufficient ETH balance");
+            (bool success, ) = msg.sender.call.value(_amount)("");
+            require(success, "[sendFunds] ETH Transfer failure");
+            emit Transfer(
+                address(0),
+                address(this),
+                msg.sender,
+                _amount
+            );
+        } else {
+            // ERC20 fund
+            IERC20 token = IERC20(_tokenAddress);
+            address self = address(this);
+            require(_amount <= token.balanceOf(self), "Insufficient ERC20 balance");
+            require(token.transfer(msg.sender, _amount), "Cannot transsfer ERC20");
+            emit Transfer(
+                _tokenAddress,
+                address(this),
+                msg.sender,
+                _amount
+            );
+        }
     }
 
     /**
@@ -114,22 +121,6 @@ contract DeadManSwitch is Ownership {
             _contractAddress,
             msg.sender,
             address(this),
-            _amount
-        );
-    }
-
-    /**
-     * @dev Allow withdrawal of ERC20 token for owner or beneficiary (when owner died)
-     */
-    function withdrawERC20(address _contractAddress, uint256 _amount) external onlyAllowWithdrawal {
-        IERC20 token = IERC20(_contractAddress);
-        address self = address(this);
-        require(_amount <= token.balanceOf(self), "Insufficient balance.");
-        require(token.transfer(msg.sender, _amount));
-        emit Transfer(
-            _contractAddress,
-            address(this),
-            msg.sender,
             _amount
         );
     }

@@ -8,19 +8,7 @@ import * as TruffleContracts from ".";
 declare global {
   namespace Truffle {
     interface Artifacts {
-      require(name: "Context"): TruffleContracts.ContextContract;
       require(name: "DeadManSwitch"): TruffleContracts.DeadManSwitchContract;
-      require(name: "DMSFactory"): TruffleContracts.DMSFactoryContract;
-      require(name: "ERC20"): TruffleContracts.ERC20Contract;
-      require(name: "ERC20Burnable"): TruffleContracts.ERC20BurnableContract;
-      require(name: "ERC20Detailed"): TruffleContracts.ERC20DetailedContract;
-      require(name: "ERC20Mintable"): TruffleContracts.ERC20MintableContract;
-      require(name: "HuntToken"): TruffleContracts.HuntTokenContract;
-      require(name: "IERC20"): TruffleContracts.IERC20Contract;
-      require(name: "Migrations"): TruffleContracts.MigrationsContract;
-      require(name: "MinterRole"): TruffleContracts.MinterRoleContract;
-      require(name: "Ownable"): TruffleContracts.OwnableContract;
-      require(name: "Ownership"): TruffleContracts.OwnershipContract;
     }
   }
 }

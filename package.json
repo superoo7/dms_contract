@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "truffle test --network=develop",
-    "build": "truffle compile && typechain --target=truffle client/src/contracts/**/*.json",
+    "build": "truffle compile && typechain --target=truffle build/**/*.json",
     "postinstall": "npm run build"
   },
   "repository": {

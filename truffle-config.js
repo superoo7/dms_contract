@@ -32,7 +32,7 @@ require("tsconfig-paths/register");
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
-  contracts_build_directory: path.join(__dirname, "client/src/contracts"),
+  contracts_build_directory: path.join(__dirname, "build"),
 
   /**
    * Networks define how you connect to your ethereum client and let you set the
